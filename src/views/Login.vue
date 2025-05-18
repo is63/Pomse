@@ -31,6 +31,7 @@ async function login() {
     if (response.data && response.data.access_token) {
       sessionStorage.setItem('token', response.data.access_token)
       sessionStorage.setItem('user', JSON.stringify(response.data.user_info))
+      window.dispatchEvent(new Event('token-changed'))
       router.push('/')
     } else {
       error.value = 'Credenciales incorrectas.'

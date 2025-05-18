@@ -11,14 +11,17 @@ function onLogoLeave() {
     logoSrc.value = '/public/favicon2.png'
 }
 
-// Si el token puede cambiar durante la sesión, escucha el evento de storage
-window.addEventListener('storage', () => {
+function updateTokenStatus() {
     hasToken.value = !!sessionStorage.getItem('token')
-})
+}
+
+window.addEventListener('storage', updateTokenStatus)
+window.addEventListener('token-changed', updateTokenStatus)
 
 function logout() {
     sessionStorage.removeItem('token')
     hasToken.value = false
+    window.dispatchEvent(new Event('token-changed'))
     // Redirige o recarga si lo necesitas
 }
 </script>

@@ -33,8 +33,8 @@ const expanded = ref(false)
     width: 2.5vw;
     min-width: 48px;
     max-width: 220px;
-    background: linear-gradient(120deg, #191919 85%, #232323 100%);
-    color: #ffd91c;
+    background: linear-gradient(90deg, rgba(34, 34, 34, 0.85) 70%, rgba(34, 34, 34, 0.18) 100%);
+    color: #e2c94c;
     transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.3s, box-shadow 0.3s;
     overflow-x: hidden;
     z-index: 1000;
@@ -51,7 +51,7 @@ const expanded = ref(false)
 .sidebar.expanded {
     width: 10vw;
     min-width: 120px;
-    background: linear-gradient(120deg, #232323 80%, #191919 100%);
+    background: linear-gradient(90deg, rgba(34, 34, 34, 0.93) 80%, rgba(34, 34, 34, 0.10) 100%);
     box-shadow: 0.2vw 0 2vw 0.2vw rgba(255, 217, 28, 0.08);
 }
 
@@ -101,8 +101,8 @@ const expanded = ref(false)
 }
 
 .menu-item {
-    padding: 1.2vh 0.8vw;
-    border-radius: 0.7vw;
+    padding: 1vh 0.6vw;
+    border-radius: 0.6vw;
     cursor: pointer;
     white-space: nowrap;
     transition: background 0.2s, color 0.2s, box-shadow 0.2s;
@@ -111,24 +111,26 @@ const expanded = ref(false)
     justify-content: center;
     position: relative;
     border-left: 3px solid transparent;
+    font-size: 0.98rem;
 }
 
 .menu-item .icon {
-    font-size: 2.5vh;
-    color: #ffd91c;
-    filter: drop-shadow(0 0 2px #bfa60088);
-    margin-right: 0.2vw;
+    font-size: 1.7vh;
+    color: #e2c94c;
+    filter: none;
+    margin-right: 0.18vw;
 }
 
 .menu-item .text {
-    margin-left: 0.4vw;
-    margin-right: 0.3vw;
+    margin-left: 0.3vw;
+    margin-right: 0.2vw;
     transition: opacity 0.2s, width 0.2s;
     white-space: nowrap;
     overflow: hidden;
     color: #fffbe6;
     font-weight: 500;
     letter-spacing: 0.01em;
+    font-size: 0.97rem;
 }
 
 .sidebar:not(.expanded) .menu-item .text {
@@ -144,13 +146,14 @@ const expanded = ref(false)
 
 .menu-item:hover,
 .menu-item.router-link-exact-active {
-    background: rgba(255, 221, 28, 0.13);
+    background: rgba(255, 221, 28, 0.08);
     color: #ffd91c;
     border-left: 3px solid #ffd91c;
-    box-shadow: 0 0 8px 0 #ffd91c33;
+    border-bottom: 2.5px solid #232323;
+    box-shadow: none;
 }
 
 .menu-item:not(:last-child) {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
 }
 </style>

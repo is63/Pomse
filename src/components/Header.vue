@@ -1,4 +1,5 @@
 <script setup>
+import router from '@/router'
 import { ref } from 'vue'
 
 const logoSrc = ref('/public/favicon2.png')
@@ -12,7 +13,7 @@ function onLogoLeave() {
 }
 
 function updateTokenStatus() {
-    hasToken.value = !!sessionStorage.getItem('token')
+    hasToken.value = sessionStorage.getItem('token') !== null;
 }
 
 window.addEventListener('storage', updateTokenStatus)
@@ -22,7 +23,8 @@ function logout() {
     sessionStorage.removeItem('token')
     hasToken.value = false
     window.dispatchEvent(new Event('token-changed'))
-    // Redirige o recarga si lo necesitas
+    window.location.reload() 
+    
 }
 </script>
 

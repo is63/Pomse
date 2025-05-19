@@ -1,5 +1,7 @@
 <script setup>
+import { onMounted, ref } from 'vue'
 import Cards from '../components/Cards.vue'
+import FriendsList from '../components/FriendsList.vue';
 
 </script>
 
@@ -7,8 +9,19 @@ import Cards from '../components/Cards.vue'
   <div class="center">
     <Cards />
   </div>
+  <div id="friends">
+    <FriendsList />
+    </div>
 </template>
 
 <style scoped>
+.center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 
+#friends {
+  text-align: center;
+}
 </style>

@@ -16,6 +16,15 @@ let loading = ref(false) // Estado de carga
 let router = useRouter() // Router para redirección
 let showRegister = ref(false) // Alterna entre login y registro
 let registerSuccess = ref(false) // Indica exito en el registro
+const loginPageVisible = ref(true)
+
+function animateAndRedirectHome() {
+  loginPageVisible.value = false
+  setTimeout(() => {
+    window.dispatchEvent(new Event('token-changed'))
+    router.push('/')
+  }, 700) // Duración de la animación
+}
 
 
 // Envía email y contraseña a la API
@@ -31,8 +40,8 @@ async function login() {
     if (response.data && response.data.access_token) {
       sessionStorage.setItem('token', response.data.access_token)
       sessionStorage.setItem('user', JSON.stringify(response.data.user_info))
-      window.dispatchEvent(new Event('token-changed'))
-      router.push('/')
+      animateAndRedirectHome()
+      return
     } else {
       error.value = 'Credenciales incorrectas.'
     }
@@ -57,7 +66,7 @@ async function register() {
   }
   try {
     const response = await axios.post('apiRegister', {
-      usuario: username.value, // Cambia 'username' por 'usuario'
+      usuario: username.value,
       email: email.value,
       password: password.value,
       password_confirmation: passwordConfirmation.value
@@ -73,8 +82,9 @@ async function register() {
         password.value = ''
         email.value = ''
         passwordConfirmation.value = ''
-      }, 1500);
-      //      router.push('/')
+        animateAndRedirectHome()
+      }, 700)
+      return
     } else {
       error.value = response.data.message || 'No se pudo registrar.'
     }
@@ -101,61 +111,63 @@ function onAfterLeave(el) {
 </script>
 
 <template>
-  <div class="login-bg">
-    <!-- Transición entre login y registro -->
-    <transition name="dust" mode="out-in" @before-leave="onBeforeLeave" @after-leave="onAfterLeave">
-      <!-- FORMULARIO DE LOGIN -->
-      <form v-if="!showRegister" key="login" class="login-card" @submit.prevent="login">
-        <h2 class="login-title">Iniciar Sesión</h2>
-        <div v-if="error" class="login-error">{{ error }}</div>
-        <div class="login-group">
-          <label for="login-email">Email</label>
-          <input id="login-email" v-model="email" type="email" required autocomplete="email" />
-        </div>
-        <div class="login-group">
-          <label for="password">Contraseña</label>
-          <input id="password" v-model="password" type="password" required autocomplete="current-password" />
-        </div>
-        <button class="login-btn" :disabled="loading">
-          {{ loading ? 'Accediendo...' : 'Acceder' }}
-        </button>
-        <div class="login-switch">
-          ¿No tienes cuenta?
-          <a href="#" @click.prevent="showRegister = true">Regístrate</a>
-        </div>
-      </form>
-      <!-- FORMULARIO DE REGISTRO -->
-      <form v-else key="register" class="login-card" @submit.prevent="register">
-        <h2 class="login-title">Registro</h2>
-        <div v-if="error" class="login-error">{{ error }}</div>
-        <div v-if="registerSuccess" class="login-success">¡Registro exitoso! Ahora puedes iniciar sesión.</div>
-        <div class="login-group">
-          <label for="reg-username">Usuario</label>
-          <input id="reg-username" v-model="username" type="text" required autocomplete="username" />
-        </div>
-        <div class="login-group">
-          <label for="reg-email">Email</label>
-          <input id="reg-email" v-model="email" type="email" required autocomplete="email" />
-        </div>
-        <div class="login-group">
-          <label for="reg-password">Contraseña</label>
-          <input id="reg-password" v-model="password" type="password" required autocomplete="new-password" />
-        </div>
-        <div class="login-group">
-          <label for="reg-password-confirm">Confirmar Contraseña</label>
-          <input id="reg-password-confirm" v-model="passwordConfirmation" type="password" required
-            autocomplete="new-password" />
-        </div>
-        <button class="login-btn" :disabled="loading">
-          {{ loading ? 'Registrando...' : 'Registrarse' }}
-        </button>
-        <div class="login-switch">
-          ¿Ya tienes cuenta?
-          <a href="#" @click.prevent="showRegister = false">Inicia sesión</a>
-        </div>
-      </form>
-    </transition>
-  </div>
+  <transition name="fall-away" appear>
+    <div v-if="loginPageVisible" class="login-bg">
+      <!-- Transición entre login y registro -->
+      <transition name="dust" mode="out-in" @before-leave="onBeforeLeave" @after-leave="onAfterLeave">
+        <!-- FORMULARIO DE LOGIN -->
+        <form v-if="!showRegister" key="login" class="login-card" @submit.prevent="login">
+          <h2 class="login-title">Iniciar Sesión</h2>
+          <div v-if="error" class="login-error">{{ error }}</div>
+          <div class="login-group">
+            <label for="login-email">Email</label>
+            <input id="login-email" v-model="email" type="email" required autocomplete="email" />
+          </div>
+          <div class="login-group">
+            <label for="password">Contraseña</label>
+            <input id="password" v-model="password" type="password" required autocomplete="current-password" />
+          </div>
+          <button class="login-btn" :disabled="loading">
+            {{ loading ? 'Accediendo...' : 'Acceder' }}
+          </button>
+          <div class="login-switch">
+            ¿No tienes cuenta?
+            <a href="#" @click.prevent="showRegister = true">Regístrate</a>
+          </div>
+        </form>
+        <!-- FORMULARIO DE REGISTRO -->
+        <form v-else key="register" class="login-card" @submit.prevent="register">
+          <h2 class="login-title">Registro</h2>
+          <div v-if="error" class="login-error">{{ error }}</div>
+          <div v-if="registerSuccess" class="login-success">¡Registro exitoso! </div>
+          <div class="login-group">
+            <label for="reg-username">Usuario</label>
+            <input id="reg-username" v-model="username" type="text" required autocomplete="username" />
+          </div>
+          <div class="login-group">
+            <label for="reg-email">Email</label>
+            <input id="reg-email" v-model="email" type="email" required autocomplete="email" />
+          </div>
+          <div class="login-group">
+            <label for="reg-password">Contraseña</label>
+            <input id="reg-password" v-model="password" type="password" required autocomplete="new-password" />
+          </div>
+          <div class="login-group">
+            <label for="reg-password-confirm">Confirmar Contraseña</label>
+            <input id="reg-password-confirm" v-model="passwordConfirmation" type="password" required
+              autocomplete="new-password" />
+          </div>
+          <button class="login-btn" :disabled="loading">
+            {{ loading ? 'Registrando...' : 'Registrarse' }}
+          </button>
+          <div class="login-switch">
+            ¿Ya tienes cuenta?
+            <a href="#" @click.prevent="showRegister = false">Inicia sesión</a>
+          </div>
+        </form>
+      </transition>
+    </div>
+  </transition>
 </template>
 
 <style scoped>
@@ -320,6 +332,30 @@ function onAfterLeave(el) {
     opacity: 1;
     filter: blur(0px);
     transform: scale(1) translateY(0);
+  }
+}
+
+.fall-away-leave-active {
+  animation: fall-away-exit 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes fall-away-exit {
+  0% {
+    opacity: 1;
+    transform: none;
+    filter: blur(0px);
+  }
+
+  60% {
+    opacity: 0.7;
+    transform: rotateZ(2deg) translateY(-10px) scale(1.05);
+    filter: blur(2px);
+  }
+
+  100% {
+    opacity: 0;
+    transform: rotateZ(18deg) translateY(120vh) scale(0.8) skewX(10deg);
+    filter: blur(12px);
   }
 }
 </style>

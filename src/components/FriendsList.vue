@@ -1,49 +1,71 @@
 <script setup>
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, onUnmounted } from 'vue';
 
 axios.defaults.baseURL = 'http://localhost:8080/api/';
-const friends = ref([])
-const loadingFriends = ref(true)
-const noFriendsMsg = ref('')
+let friends = ref([])
+let loadingFriends = ref(true)
+let noFriendsMsg = ref('')
 
-onMounted(async () => {
-  const token = sessionStorage.getItem('token')
+async function fetchFriendInfo(id) {
+  let token = sessionStorage.getItem('token')
+  try {
+    let response = await axios.get(`users/${id}`,
+      token ? { headers: { 'Authorization': `Bearer ${token}` } } : undefined
+    )
+    return response.data
+  } catch {
+    return null
+  }
+}
+
+function resetFriends() {
+  friends.value = []
+  noFriendsMsg.value = 'Descubre a gente nueva'
+  loadingFriends.value = false
+}
+
+async function loadFriends() {
+  let token = sessionStorage.getItem('token')
   if (!token) {
-    noFriendsMsg.value = 'Descubre a gente nueva'
-    loadingFriends.value = false
+    resetFriends()
     return
   }
+  loadingFriends.value = true
   try {
-    const response = await axios.get('friendshipsOfUser', {
+    let response = await axios.get('friendshipsOfUser', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
     })
-    // La API devuelve un array de objetos con amigo_id y accepted
-    const data = response.data
+    let data = response.data
     if (Array.isArray(data) && data.length > 0) {
-      // Solo mostrar amigos aceptados (accepted == 1)
-      const accepted = data.filter(f => String(f.accepted) === '1').slice(0, 5)
+      let accepted = data.filter(f => String(f.accepted) === '1').slice(0, 5)
       if (accepted.length > 0) {
-        friends.value = accepted.map(f => `Amigo #${f.amigo_id}`);
+        let friendInfos = await Promise.all(
+          accepted.map(f => fetchFriendInfo(f.amigo_id))
+        )
+        friends.value = friendInfos.filter(Boolean)
+        noFriendsMsg.value = ''
       } else {
-        noFriendsMsg.value = 'Descubre a gente nueva'
+        resetFriends()
       }
     } else {
-      noFriendsMsg.value = 'Descubre a gente nueva'
+      resetFriends()
     }
   } catch (e) {
-    noFriendsMsg.value = 'Descubre a gente nueva'
+    resetFriends()
   } finally {
     loadingFriends.value = false
   }
-})
+}
 
-window.addEventListener('token-changed', () => {
-  friends.value = []
-  noFriendsMsg.value = 'Descubre a gente nueva'
-  loadingFriends.value = false
+onMounted(() => {
+  loadFriends()
+  window.addEventListener('token-changed', loadFriends)
+})
+onUnmounted(() => {
+  window.removeEventListener('token-changed', loadFriends)
 })
 </script>
 
@@ -52,22 +74,28 @@ window.addEventListener('token-changed', () => {
     <div class="friends-list-header">
       <h2 class="friends-list-title">Tus amigos</h2>
     </div>
-    <ul v-if="!loadingFriends && friends.length" class="friends-list-ul">
+    <ul v-if="!loadingFriends && friends.length > 0" class="friends-list-ul">
       <li v-for="(friend, index) in friends" :key="index" class="friends-list-li">
         <a class="friend-link" href="#">
           <span class="friend-avatar">
             <span class="avatar-img">
-              <img src="/public/icons/comment.svg" alt="avatar" width="32" height="32" />
+              <img :src="friend.foto
+                ? (friend.foto.startsWith('http')
+                  ? friend.foto
+                  : (friend.foto.startsWith('storage/')
+                    ? 'http://localhost:8080/' + friend.foto
+                    : '/' + friend.foto.replace(/^public\//, '')))
+                : '/icons/comment.svg'" alt="avatar" width="32" height="32" />
             </span>
           </span>
           <span class="friend-info">
-            <span class="friend-name">{{ friend }}</span>
+            <span class="friend-name">{{ friend.usuario || friend.nombre || friend.name || 'Amigo' }}</span>
             <span class="friend-meta">Amistad aceptada</span>
           </span>
         </a>
       </li>
     </ul>
-    <div v-else-if="!loadingFriends && noFriendsMsg" class="no-friends-msg">{{ noFriendsMsg }}</div>
+    <div v-else-if="!loadingFriends && !friends.length && noFriendsMsg" class="no-friends-msg">{{ noFriendsMsg }}</div>
   </aside>
 </template>
 

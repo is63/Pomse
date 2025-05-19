@@ -1,5 +1,4 @@
 <script setup>
-import { onMounted, ref } from 'vue'
 import Cards from '../components/Cards.vue'
 import FriendsList from '../components/FriendsList.vue';
 

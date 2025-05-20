@@ -40,10 +40,10 @@ async function loadFriends() {
     })
     let data = response.data
     if (Array.isArray(data) && data.length > 0) {
-      let accepted = data.filter(f => String(f.accepted) === '1').slice(0, 5)
+      let accepted = data.filter(friend => String(friend.accepted) === '1').slice(0, 5)
       if (accepted.length > 0) {
         let friendInfos = await Promise.all(
-          accepted.map(f => fetchFriendInfo(f.amigo_id))
+          accepted.map(friend => fetchFriendInfo(friend.amigo_id))
         )
         friends.value = friendInfos.filter(Boolean)
         noFriendsMsg.value = ''
@@ -85,7 +85,7 @@ onUnmounted(() => {
                   : (friend.foto.startsWith('storage/')
                     ? 'http://localhost:8080/' + friend.foto
                     : '/' + friend.foto.replace(/^public\//, '')))
-                : '/icons/comment.svg'" alt="avatar" width="32" height="32" />
+                : '/icons/favicon.svg'" alt="avatar" width="32" height="32" />
             </span>
           </span>
           <span class="friend-info">

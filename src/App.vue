@@ -48,11 +48,6 @@ onMounted(async () => {
   /* deja espacio para el header fijo */
 }
 
-.header-gradient {
-  width: 100vw;
-  height: 2vh;
-  background: #222;
-}
 
 .main-content {
   flex: 1;
@@ -85,7 +80,7 @@ onMounted(async () => {
 }
 
 .layout {
-  background: #222;
+  background-color: transparent;
   color: white;
 }
 </style>

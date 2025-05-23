@@ -77,5 +77,4 @@ const userAvatar = computed(() => {
 </template>
 
 <style scoped>
-/* No custom styles, todo es Bootstrap + utilidades inline */
 </style>

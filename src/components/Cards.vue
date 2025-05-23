@@ -2,7 +2,6 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 
-// Importa los SVG como módulos
 import commentIcon from '/public/icons/comment.svg'
 import likeIcon from '/public/icons/like.svg'
 import saveIcon from '/public/icons/save.svg'
@@ -11,7 +10,7 @@ axios.defaults.baseURL = 'http://localhost:8080/api/'
 
 const data = ref(null)
 const error = ref(null)
-const commentsCount = ref({}) // Guarda el número de comentarios por post
+const commentsCount = ref({}) 
 const likesCount = ref({})
 
 function getImageUrl(path) {
@@ -23,7 +22,7 @@ function getImageUrl(path) {
 async function fetchCommentsCount(postId) {
     try {
         const response = await axios.get(`commentsOfPost/${postId}`)
-        // Accede a response.data.comments
+        
         commentsCount.value[postId] = Array.isArray(response.data.comments) ? response.data.comments.length : 0
     } catch (e) {
         commentsCount.value[postId] = 0
@@ -34,7 +33,6 @@ async function fetchCommentsCount(postId) {
 async function fetchLikesCount(postId) {
     try {
         const response = await axios.get(`likesOfPost/${postId}`)
-        // Accede a response.data.likes
         likesCount.value[postId] = Array.isArray(response.data.likes) ? response.data.likes.length : 0
     } catch (e) {
         likesCount.value[postId] = 0
@@ -45,7 +43,7 @@ onMounted(async () => {
     try {
         const response = await axios.get('posts')
         data.value = response.data
-        // Llama a la función para cada post
+        // Llamar a la función para cada post
         if (Array.isArray(data.value)) {
             for (const post of data.value) {
                 fetchCommentsCount(post.id)

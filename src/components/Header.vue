@@ -1,5 +1,4 @@
 <script setup>
-import router from '@/router'
 import { ref, computed, onMounted } from 'vue'
 
 const logoSrc = ref('/public/favicon2.png')

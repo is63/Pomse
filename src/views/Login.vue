@@ -284,7 +284,7 @@ function onAfterLeave(el) {
   margin-left: 0.3em;
 }
 
-/* Animación de "polvo" para el formulario saliente */
+/* Animación de desaparecer para el formulario que sale */
 .dust-leave-active {
   animation: dust-exit 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
 }
